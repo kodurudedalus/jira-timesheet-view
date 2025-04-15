@@ -23,6 +23,8 @@ try:
     jira = JIRA(server=JIRA_URL, token_auth=JIRA_API_TOKEN)
 except Exception as e:
     st.error(f"Failed to connect to JIRA: {e}")
+    st.text(f"Type: {type(e)}")
+    st.text(f"Error: {str(e)}")
     st.stop()
 
 # -------------------- Helper Function --------------------
