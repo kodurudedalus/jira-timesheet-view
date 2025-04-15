@@ -5,6 +5,7 @@ from jira import JIRA
 from jinja2 import Environment, FileSystemLoader
 import re
 import os
+import requests
 
 # -------------------- Load from Streamlit Secrets --------------------
 JIRA_URL = st.secrets.get("JIRA_URL")
@@ -20,7 +21,13 @@ if not JIRA_API_TOKEN:
 
 # -------------------- JIRA Auth --------------------
 try:
-    jira = JIRA(server=JIRA_URL, token_auth=JIRA_API_TOKEN)
+    res = requests.get(JIRA_URL)
+    st.write("Can access JIRA URL? ✅", res.status_code)
+except Exception as e:
+    st.error("Cannot reach JIRA server.")
+    st.text(str(e))
+try:
+    jira = JIRA(server=JIRA_URL,token_auth=JIRA_API_TOKEN)
 except Exception as e:
     st.error(f"Failed to connect to JIRA: {e}")
     st.text(f"Type: {type(e)}")
