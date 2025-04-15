@@ -7,8 +7,8 @@ import re
 import os
 
 # -------------------- Load from Streamlit Secrets --------------------
-JIRA_URL = st.secrets.get("JIRA_URL", "")
-JIRA_API_TOKEN = st.secrets.get("JIRA_API_TOKEN", "")
+JIRA_URL = st.secrets.get("JIRA_URL")
+JIRA_API_TOKEN = st.secrets.get("JIRA_API_TOKEN")
 
 if not JIRA_URL:
     st.error("❌ JIRA_URL is missing in Streamlit secrets.")
