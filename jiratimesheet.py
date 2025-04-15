@@ -36,12 +36,6 @@ try:
 except Exception as e:
     st.error("Cannot reach JIRA server.")
     st.text(str(e))
-try:
-    jira = JIRA(server=JIRA_URL,token_auth=JIRA_API_TOKEN)
-except Exception as e:
-    st.error(f"Failed to connect to JIRA: {e}")
-    st.text(f"Type: {type(e)}")
-    st.text(f"Error: {str(e)}")
     st.stop()
 
 # -------------------- Helper Function --------------------
