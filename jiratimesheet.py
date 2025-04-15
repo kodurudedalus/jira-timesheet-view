@@ -10,6 +10,14 @@ import os
 JIRA_URL = st.secrets["JIRA_URL"]
 JIRA_API_TOKEN = st.secrets["JIRA_API_TOKEN"]
 
+if not JIRA_URL:
+    st.error("❌ JIRA_URL is missing in Streamlit secrets.")
+    st.stop()
+
+if not JIRA_API_TOKEN:
+    st.error("❌ JIRA_API_TOKEN is missing in Streamlit secrets.")
+    st.stop()
+
 # -------------------- JIRA Auth --------------------
 try:
     jira = JIRA(server=JIRA_URL, token_auth=JIRA_API_TOKEN)
