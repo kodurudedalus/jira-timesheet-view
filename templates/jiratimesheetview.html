@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JIRA Timesheet</title>
+    <style>
+        body { font-family: sans-serif; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; text-align: center; padding: 8px; }
+        th { background-color: #f2f2f2; }
+        .weekend { background-color: #fff9d6 !important; }
+        .under-9 { background-color: #f8d7da !important; }
+        .over-9 { background-color: #cce5ff !important; }
+        .exact-9 { background-color: #d4edda !important; }
+        .hour-cell { cursor: pointer; padding: 6px; border-radius: 5px; }
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh; overflow: auto; background-color: rgba(0, 0, 0, 0.6); }
+        .modal-content { background-color: #fff; margin: 8% auto; padding: 20px; border-radius: 8px; width: 400px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); position: relative; }
+        .modal-header { font-weight: bold; margin-bottom: 10px; }
+        .close { position: absolute; top: 10px; right: 15px; font-size: 20px; cursor: pointer; }
+        ul { padding-left: 20px; margin-top: 10px; }
+        ul li { margin-bottom: 6px; text-align: left; }
+    </style>
+</head>
+<body>
+    <h3>JIRA Timesheet</h3>
+    <p><strong>From:</strong> {{ from_date }} &nbsp;&nbsp; <strong>To:</strong> {{ to_date }}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>User</th>
+                {% for date, day, is_weekend in dates %}
+                <th class="{{ 'weekend' if is_weekend }}">{{ date }}<br>{{ day }}</th>
+                {% endfor %}
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td><strong>{{ user }}</strong></td>
+                {% for date, day, is_weekend in dates %}
+                    {% set entry = data[user][date] %}
+                    {% if entry %}
+                        {% set hours = entry.hours %}
+                        {% if hours < 9.0 %}
+                            {% set color_class = 'under-9' %}
+                        {% elif hours == 9.0 %}
+                            {% set color_class = 'exact-9' %}
+                        {% else %}
+                            {% set color_class = 'over-9' %}
+                        {% endif %}
+                        <td class="{{ 'weekend' if is_weekend }}">
+                            <div class="hour-cell {{ color_class }}" onclick="openModal('{{ user }}', '{{ date }}')">
+                                {{ hours }}h
+                            </div>
+                            <div id="modal-{{ user }}-{{ date }}" class="modal">
+                                <div class="modal-content">
+                                    <span class="close" onclick="closeModal('{{ user }}', '{{ date }}')">&times;</span>
+                                    <div class="modal-header">{{ user }} - {{ date }}</div>
+                                    <ul>
+                                        {% for detail in entry.details %}
+                                            <li>{{ detail }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                    {% else %}
+                        <td class="{{ 'weekend' if is_weekend }}">-</td>
+                    {% endif %}
+                {% endfor %}
+                <td><strong>{{ "%.2f"|format(user_totals[user]) }}h</strong></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h4>Total Hours (All Users): <strong>{{ "%.2f"|format(grand_total) }}h</strong></h4>
+
+    <script>
+        function openModal(user, date) {
+            document.getElementById("modal-" + user + "-" + date).style.display = "block";
+        }
+        function closeModal(user, date) {
+            document.getElementById("modal-" + user + "-" + date).style.display = "none";
+        }
+        window.onclick = function (event) {
+            const modals = document.getElementsByClassName("modal");
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target === modals[i]) {
+                    modals[i].style.display = "none";
+                }
+            }
+        };
+    </script>
+</body>
+</html>
