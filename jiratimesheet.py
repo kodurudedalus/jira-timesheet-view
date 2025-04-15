@@ -7,10 +7,14 @@ from jinja2 import Environment, FileSystemLoader
 import re
 import os
 
-# -------------------- Load environment --------------------
-load_dotenv()
-JIRA_URL = os.getenv("JIRA_URL")
-API_TOKEN = os.getenv("JIRA_API_TOKEN")
+# # -------------------- Load environment use for Development --------------------
+# load_dotenv()
+# JIRA_URL = os.getenv("JIRA_URL")
+# API_TOKEN = os.getenv("JIRA_API_TOKEN")
+
+# -------------------- Load from Streamlit Secrets --------------------
+JIRA_URL = st.secrets.get("JIRA_URL")
+API_TOKEN = st.secrets.get("JIRA_API_TOKEN")
 
 # -------------------- JIRA Auth --------------------
 try:
