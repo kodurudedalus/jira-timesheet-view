@@ -23,6 +23,7 @@ if not JIRA_API_TOKEN:
 try:
     res = requests.get(JIRA_URL)
     st.write("Can access JIRA URL? ✅", res.status_code)
+    st.code(res.text)
 except Exception as e:
     st.error("Cannot reach JIRA server.")
     st.text(str(e))
