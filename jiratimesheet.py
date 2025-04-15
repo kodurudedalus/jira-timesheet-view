@@ -7,6 +7,10 @@ import re
 import os
 import requests
 
+# -------------------- Streamlit UI --------------------
+st.set_page_config(page_title="JIRA Timesheet Viewer", layout="wide")
+st.title("📅 JIRA Timesheet Viewer")
+
 # -------------------- Load from Streamlit Secrets --------------------
 JIRA_URL = st.secrets.get("JIRA_URL")
 JIRA_API_TOKEN = st.secrets.get("JIRA_API_TOKEN")
@@ -20,6 +24,18 @@ if not JIRA_API_TOKEN:
     st.stop()
 
 # -------------------- JIRA Auth --------------------
+try:
+        options = {
+            'server': JIRA_URL,
+            'headers': {
+                'Authorization': f'Bearer {JIRA_API_TOKEN}'
+            }
+        }
+        jira = JIRA(options=options)
+        st.success("Connected with Bearer token")
+except Exception as e:
+    st.error("Cannot reach JIRA server.")
+    st.text(str(e))
 try:
     jira = JIRA(server=JIRA_URL,token_auth=JIRA_API_TOKEN)
 except Exception as e:
@@ -42,10 +58,6 @@ def parse_time_spent(time_str):
     if m := re.search(r'(\d+)\s*m', time_str):
         total_hours += int(m.group(1)) / 60.0
     return total_hours
-
-# -------------------- Streamlit UI --------------------
-st.set_page_config(page_title="JIRA Timesheet Viewer", layout="wide")
-st.title("📅 JIRA Timesheet Viewer")
 
 # -------------------- Navigation --------------------
 page = st.sidebar.selectbox("Select Page", ["Home", "Timesheet Viewer"])
