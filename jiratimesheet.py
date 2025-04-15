@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 from jira import JIRA
-from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader
 import re
 import os
