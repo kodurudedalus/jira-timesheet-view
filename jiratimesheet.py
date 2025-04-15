@@ -14,6 +14,7 @@ st.title("📅 JIRA Timesheet Viewer")
 # -------------------- Load from Streamlit Secrets --------------------
 JIRA_URL = st.secrets.get("JIRA_URL")
 JIRA_API_TOKEN = st.secrets.get("JIRA_API_TOKEN")
+JIRA_EMAIL = st.secrets.get("JIRA_EMAIL")
 
 if not JIRA_URL:
     st.error("❌ JIRA_URL is missing in Streamlit secrets.")
@@ -27,9 +28,7 @@ if not JIRA_API_TOKEN:
 try:
         options = {
             'server': JIRA_URL,
-            'headers': {
-                'Authorization': f'Bearer {JIRA_API_TOKEN}'
-            }
+            'basic_auth': (JIRA_EMAIL, JIRA_API_TOKEN)
         }
         jira = JIRA(options=options)
         st.success("Connected with Bearer token")
