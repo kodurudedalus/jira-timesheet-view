@@ -6,18 +6,13 @@ from jinja2 import Environment, FileSystemLoader
 import re
 import os
 
-# # -------------------- Load environment use for Development --------------------
-# load_dotenv()
-# JIRA_URL = os.getenv("JIRA_URL")
-# API_TOKEN = os.getenv("JIRA_API_TOKEN")
-
 # -------------------- Load from Streamlit Secrets --------------------
-JIRA_URL = st.secrets.get("JIRA_URL")
-API_TOKEN = st.secrets.get("JIRA_API_TOKEN")
+JIRA_URL = st.secrets["JIRA_URL"]
+JIRA_API_TOKEN = st.secrets["JIRA_API_TOKEN"]
 
 # -------------------- JIRA Auth --------------------
 try:
-    jira = JIRA(server=JIRA_URL, token_auth=API_TOKEN)
+    jira = JIRA(server=JIRA_URL, token_auth=JIRA_API_TOKEN)
 except Exception as e:
     st.error(f"Failed to connect to JIRA: {e}")
     st.stop()
