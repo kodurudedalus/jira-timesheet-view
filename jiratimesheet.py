@@ -23,14 +23,6 @@ if not JIRA_API_TOKEN:
     st.error("❌ JIRA_API_TOKEN is missing in Streamlit secrets.")
     st.stop()
 
-# -------------------- User Authentication --------------------
-if not st.experimental_user.is_logged_in:
-    st.button("Log in", on_click=st.login)
-    st.stop()
-
-# Optional: Show user info
-st.markdown(f"**Welcome, {st.experimental_user.name}**")
-
 # -------------------- JIRA Auth --------------------
 try:
         options = {
