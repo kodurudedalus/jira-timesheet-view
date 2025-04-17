@@ -14,7 +14,6 @@ st.title("📅 JIRA Timesheet Viewer")
 # -------------------- Load from Streamlit Secrets --------------------
 JIRA_URL = st.secrets.get("JIRA_URL")
 JIRA_API_TOKEN = st.secrets.get("JIRA_API_TOKEN")
-JIRA_EMAIL = st.secrets.get("JIRA_EMAIL")
 
 if not JIRA_URL:
     st.error("❌ JIRA_URL is missing in Streamlit secrets.")
@@ -26,12 +25,7 @@ if not JIRA_API_TOKEN:
 
 # -------------------- JIRA Auth --------------------
 try:
-        options = {
-            'server': JIRA_URL,
-            'basic_auth': (JIRA_EMAIL, JIRA_API_TOKEN)
-        }
-        jira = JIRA(options=options)
-        st.success("Connected with Bearer token")
+    jira = JIRA(server=JIRA_URL, token_auth=JIRA_API_TOKEN)
 except Exception as e:
     st.error("Cannot reach JIRA server.")
     st.text(str(e))
@@ -61,12 +55,18 @@ if page == "Home":
 
 # -------------------- Timesheet Viewer Page --------------------
 if page == "Timesheet Viewer":
+    # -------------------- Project Selection --------------------
+    projects = jira.projects()
+    project_dict = {f"{p.name} ({p.key})": p.key for p in projects}
+    selected_display = st.selectbox("Choose from available projects", sorted(project_dict.keys()))
+    selected_project = project_dict[selected_display]
+
     # Date Input for the timesheet viewer
     col1, col2 = st.columns(2)
     with col1:
-        from_date = st.date_input("From Date", datetime(2025, 3, 1))
+        from_date = st.date_input("From Date", datetime(2025, 3, 24))
     with col2:
-        to_date = st.date_input("To Date", datetime(2025, 3, 10))
+        to_date = st.date_input("To Date", datetime(2025, 3, 30))
 
     if from_date > to_date:
         st.error("❌ From Date must be earlier than To Date")
@@ -76,11 +76,6 @@ if page == "Timesheet Viewer":
         st.stop()
 
     # -------------------- JIRA Query --------------------
-    projects = jira.projects()
-    project_dict = {f"{p.name} ({p.key})": p.key for p in projects}
-    selected_display = st.selectbox("Choose from available projects", sorted(project_dict.keys()))
-    selected_project = project_dict[selected_display]
-
     jql = (
         f'project = "{selected_project}" '
         f'AND worklogDate >= "{from_date}" AND worklogDate <= "{to_date}" '
@@ -151,7 +146,7 @@ if page == "Timesheet Viewer":
 
     # -------------------- Render HTML --------------------
     env = Environment(loader=FileSystemLoader("templates"), autoescape=True)
-    template = env.get_template("jiratimesheetview.html")
+    template = env.get_template("index.html")
 
     rendered_html = template.render(
         from_date=from_date.strftime("%Y-%m-%d"),
